@@ -54,11 +54,14 @@ class MoviesController < ApplicationController
       session[:table_filters] = {} 
     end
     if params[:order] != session[:table_filters][:order] || params[:ratings] != session[:table_filters][:ratings]
-      redirect_to movies_path(session[:table_filters])
+      redirect = true
     end
     session[:table_filters][:order] = params[:order] unless params[:order].nil?
-    session[:table_filters][:ratings] = params[:ratings] unless params[:ratngs].nil?
+    session[:table_filters][:ratings] = params[:ratings] unless params[:ratings].nil?
     flash.keep
+    if redirect
+      redirect_to movies_path(session[:table_filters])
+    end
   end
 end
 
