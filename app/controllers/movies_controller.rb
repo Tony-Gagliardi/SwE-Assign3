@@ -7,7 +7,7 @@ class MoviesController < ApplicationController
   end
 
   def index
-    savesettings
+    save_settings
     filters = session[:table_filters]
     @order = filters[:order]
     @ratings = (filters[:ratings]) ? filters[:ratings].values : []
@@ -49,7 +49,7 @@ class MoviesController < ApplicationController
   end
 
   private
-  def savesettings
+  def save_settings
     if session[:table_filters].nil?
       session[:table_filters] = {} 
     end
