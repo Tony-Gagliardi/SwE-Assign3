@@ -7,7 +7,17 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    savesettings
+    filters = session[:table_filters]
+    @order = filters[:order]
+    @ratings = (filters[:ratings]) ? filters[:ratings].values : []
+    @all_ratings = Movie.ratings
+
+   if Movie.column_names.include? @order
+     @movies = Movie.find(:all, :order => @order, :conditions => ['rating in (?)', @ratings])
+   else 
+     @movies = Movie.find(:all, :conditions => ['rating in (?)', @ratings])
+   end
   end
 
   def new
@@ -34,8 +44,21 @@ class MoviesController < ApplicationController
   def destroy
     @movie = Movie.find(params[:id])
     @movie.destroy
-    flash[:notice] = "Movie '#{@movie.title}' deleted."
+    flash[:notice] = "#{@movie.title} was successfully deleted."
     redirect_to movies_path
   end
 
+  private
+  def savesettings
+    if session[:table_filters].nil?
+      session[:table_filters] = {} 
+    end
+    if params[:order] != session[:table_filters][:order] || params[:ratings] != session[:table_filters][:ratings]
+      redirect_to movies_path(session[:table_filters])
+    end
+    session[:table_filters][:order] = params[:order] unless params[:order].nil?
+    session[:table_filters][:ratings] = params[:ratings] unless params[:ratngs].nil?
+    flash.keep
+  end
 end
+
